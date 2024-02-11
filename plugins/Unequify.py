@@ -47,5 +47,5 @@ async def unequify(client, message):
             await sts.edit(str(e))
     # ... (rest of the function code)
 
-finally:  
+
     await sts.edit(Translation.DUPLICATE_TEXT.format(total, deleted, "ᴄᴏᴍᴘʟᴇᴛᴇᴅ"), reply_markup=COMPLETED_BTN)
