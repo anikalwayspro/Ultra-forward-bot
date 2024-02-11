@@ -56,12 +56,13 @@ async def unequify(client, message):
    DUPLICATE = []
    total=deleted=0
    temp.lock[user_id] = True
-   try:
-       await sts.edit(Translation.DUPLICATE_TEXT.format(total, deleted, "ᴘʀᴏɢʀᴇssɪɴɢ"), reply_markup=CANCEL_BTN)
-       async for message in bot.search_messages(chat_id=chat_id, filter="document"):
-     if temp.CANCEL.get(user_id) == True:
-         await sts.edit(Translation.DUPLICATE_TEXT.format(total, deleted, "ᴄᴀɴᴄᴇʟʟᴇᴅ"), reply_markup=COMPLETED_BTN)
-         return await bot.stop()
+   
+try:
+    await sts.edit(Translation.DUPLICATE_TEXT.format(total, deleted, "ᴘʀᴏɢʀᴇssɪɴɢ"), reply_markup=CANCEL_BTN)
+    async for message in bot.search_messages(chat_id=chat_id, filter="document"):
+        if temp.CANCEL.get(user_id) == True:
+            await sts.edit(Translation.DUPLICATE_TEXT.format(total, deleted, "ᴄᴀɴᴄᴇʟʟᴇᴅ"), reply_markup=COMPLETED_BTN)
+            return await bot.stop()
     file = message.document
     file_id = file.file_id  # Use an alternative way to get the file ID
     if file_id in MESSAGES:
