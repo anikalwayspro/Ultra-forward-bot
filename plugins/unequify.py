@@ -57,23 +57,35 @@ async def unequify(client, message):
    total=deleted=0
    temp.lock[user_id] = True
    
+
 try:
     await sts.edit(Translation.DUPLICATE_TEXT.format(total, deleted, "ᴘʀᴏɢʀᴇssɪɴɢ"), reply_markup=CANCEL_BTN)
     async for message in bot.search_messages(chat_id=chat_id, filter="document"):
         if temp.CANCEL.get(user_id) == True:
             await sts.edit(Translation.DUPLICATE_TEXT.format(total, deleted, "ᴄᴀɴᴄᴇʟʟᴇᴅ"), reply_markup=COMPLETED_BTN)
             return await bot.stop()
-    file = message.document
-    file_id = file.file_id  # Use an alternative way to get the file ID
-    if file_id in MESSAGES:
-        DUPLICATE.append(message.id)
-    else:
-        MESSAGES.append(file_id)
-    total += 1
-    if total % 10000 == 0:
-        await sts.edit(Translation.DUPLICATE_TEXT.format(total, deleted, "ᴘʀᴏɢʀᴇssɪɴɢ"), reply_markup=CANCEL_BTN)
-    if len(DUPLICATE) >= 100:
-        await bot.delete_messages(chat_id, DUPLICATE)
-        deleted += 100
-        await sts.edit(Translation.DUPLICATE_TEXT.format(total, deleted, "ᴘʀᴏɢʀᴇssɪɴɢ"), reply_markup=CANCEL_BTN)
-        DUPLICATE = []
+
+        try:  # Handle potential exceptions within the loop
+            file = message.document
+            file_id = file.file_id  # Use an alternative way to get the file ID
+            if file_id in MESSAGES:
+                DUPLICATE.append(message.id)
+            else:
+                MESSAGES.append(file_id)
+            total += 1
+            if total % 10000 == 0:
+                await sts.edit(Translation.DUPLICATE_TEXT.format(total, deleted, "ᴘʀᴏɢʀᴇssɪɴɢ"), reply_markup=CANCEL_BTN)
+            if len(DUPLICATE) >= 100:
+                await bot.delete_messages(chat_id, DUPLICATE)
+                deleted += 100
+                await sts.edit(Translation.DUPLICATE_TEXT.format(total, deleted, "ᴘʀᴏɢʀᴇssɪɴɢ"), reply_markup=CANCEL_BTN)
+                DUPLICATE = []
+        except Exception as e:
+            print(f"Error processing message: {e}")  # Log or handle the exception
+
+except Exception as e:  # Handle exceptions from the entire try block
+    print(f"An error occurred: {e}")  # Log or handle the exception
+
+finally:  # Ensure cleanup regardless of exceptions
+    # Perform any necessary cleanup actions here, such as closing resources
+    await sts.edit(Translation.DUPLICATE_TEXT.format(total, deleted, "ᴄᴏᴍᴘʟᴇᴛᴇᴅ"), reply_markup=COMPLETED_BTN)
